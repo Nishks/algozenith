@@ -7,6 +7,10 @@ using namespace std;
 
 void solve() {
 	// cout << "let's get it done" << endl;
+	int n,m;
+	cin >> n >> m;
+
+	cout << n/m + n%m << endl;
 }
 
 int32_t main() {

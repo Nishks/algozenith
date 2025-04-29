@@ -1,4 +1,3 @@
-
 // Write your code here
 
 // you can set your Template at profile settings [https://maang.in/profile/edit-profile]
@@ -24,6 +23,16 @@ void dfs(int node, int parent, int depth){
     }
 }
 
+lli count_leaf_nodes(int node, int parent ,lli dist, lli diameter){
+    lli leafNodes = 0;
+    if(dist == diameter) leafNodes++;
+    for(auto child : g[node]){
+        if(child != parent)
+            leafNodes += count_leaf_nodes(child, node, dist+1, diameter);
+    }
+    return leafNodes;
+}
+
 void solve(){
     g.clear();
     g.resize(200010);
@@ -38,6 +47,12 @@ void solve(){
         g[b].push_back(a);
     }
 
+    // edge case
+    if(n==1){
+        cout<<1;
+        return;
+    }
+
     dfs(1,0,0);
     int maxi = 1;
     for(int i = 2; i < 200010; i++){
@@ -50,16 +65,42 @@ void solve(){
     }
 
     if(dep[maxi]&1){
-        cout << -1 << endl;
+        int center1 = maxi;
+        int center2 = 0;
+        int centerDistance = dep[maxi]/2;
+        while(centerDistance--){
+            center1 = par[center1];
+        }
+        center2 = par[center1];
+        centerDistance = dep[maxi]/2;
+        
+        lli first = count_leaf_nodes(center1, center2, 0, centerDistance);
+        lli second = count_leaf_nodes(center2, center1, 0, centerDistance);
+        cout << first * second << endl;
         return;
     }  // if diameter is odd , it means there are more than 1 center so return -1;
 
+    // if diameter is even length
     int centerDistance = dep[maxi]/2;
+    int center = maxi;
     while(centerDistance--){
-        maxi = par[maxi];
+        center = par[center];
     }
-    
-    cout << maxi << endl;
+
+    centerDistance = dep[maxi]/2;
+    lli ans = 0, sum = 0;
+    vector<int> list;
+    for(auto child : g[center]){
+        int count = count_leaf_nodes(child, center, 1, centerDistance);
+        sum += count;
+        list.push_back(count);
+    }
+
+    for(auto it : list){
+        ans += 1LL * it * (sum-it);
+        sum-=it;
+    }
+    cout << ans << endl;
 }
 
 int main() {
